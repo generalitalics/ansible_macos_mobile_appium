@@ -1,0 +1,76 @@
+- hosts: all
+  connection: local
+  become_method: sudo
+  become_user: mshoshin
+  
+  pre_tasks:
+    # раскомментировать на интеле
+    # - name: not apple processor check
+    #   fail: msg="[{{ ansible_facts['processor'] }}] processor is not suitable"
+    #   failed_when: ansible_facts['processor'].find('Apple') != -1
+
+    - name: take admin to user
+      shell: chown -R "$(whoami):admin" /opt/homebrew
+      become: true
+
+    - name: whoami
+      shell: "whoami"
+      register: whoami
+    
+    - debug:
+        msg: "{{whoami.stdout_lines}}"
+
+  vars:
+    # mas_email: "myc.at.server@gmail.com"
+    # mas_password: ""
+    ios_runtime: "16.2"
+    mas_installed_app_ids:
+      - 497799835 # Xcode
+
+    homebrew_installed_packages:
+      - appium
+      - xcodes
+      - openjdk@11
+      - maven
+      # - mas
+
+    homebrew_cask_apps:
+      - android-commandlinetools
+      - android-platform-tools
+
+  tasks:
+
+    - name: Appium configuration
+      ansible.builtin.import_tasks:
+        file: ansible_parts/appium.yml
+
+# доделать    
+    # - name: xcode aim
+    #   shell: sudo xcode-select -s /Applications/Xcode.app
+    #   become: true
+    
+    # - name: xcode update
+    #   shell: mas upgrade 497799835
+    #   become: true
+
+    - name: ~/.zprofile configuration
+      ansible.builtin.import_tasks:
+        file: ansible_parts/zprofile.yml
+
+    - name: Java and Maven configuration
+      ansible.builtin.import_tasks:
+        file: ansible_parts/maven_java.yml
+
+    - name: Sumulator iOS configuration
+      ansible.builtin.import_tasks:
+        file: ansible_parts/simulator_ios.yml
+
+    - name: Emulator Android configuration
+      ansible.builtin.import_tasks:
+        file: ansible_parts/emulator_android.yml
+
+  roles:
+    - role: geerlingguy.mac.homebrew
+      vars:
+        homebrew_user: mshoshin
+    # - role: geerlingguy.mac.mas

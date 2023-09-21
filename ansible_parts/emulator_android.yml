@@ -1,0 +1,21 @@
+---
+  - name: download emulator's resources
+    shell: sdkmanager --install "system-images;android-30;default;x86_64"
+
+  - name: delete emulator
+    shell: avdmanager -v delete avd -n MyEmulator
+
+  - name: create new emulator
+    shell: avdmanager create avd -n MyEmulator -k "system-images;android-30;default;x86_64" -d 19
+
+  - name: Copy config.ini file to new emulator
+    ansible.builtin.copy:
+      src: resources/config.ini
+      dest: ~/.android/avd/MyEmulator.avd/config.ini
+
+  - name: 11 JAVA_HOME to ~/.zprofile
+    ansible.builtin.lineinfile:
+      path: ${HOME}/.zprofile
+      regexp: '^export JAVA_HOME'
+      line: 'export JAVA_HOME=$(/usr/libexec/java_home -v 11.0.20.1)'
+      create: true

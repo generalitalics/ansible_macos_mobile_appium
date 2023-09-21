@@ -1,0 +1,12 @@
+---
+  - name: Add link to 11 java VM
+    shell: sudo ln -sfn $HOMEBREW_PREFIX/opt/openjdk@11/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-11.jdk
+    become: true
+
+  - name: Check java version
+    shell: java -version
+    register: java_version
+
+  - name: Print java version output
+    debug:
+      msg: java_version.stdout

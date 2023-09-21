@@ -1,0 +1,27 @@
+---
+  - name: runtime check
+    shell: xcrun simctl list runtimes | grep "iOS {{ ios_runtime }}" 
+    ignore_errors: true
+    register: check_runtime
+
+  - name: runtime check debug
+    debug:
+      msg: "{{ check_runtime.stdout }}"
+
+  - name: install runtime
+    shell: sudo xcodes runtimes install "iOS {{ ios_runtime }}"
+    when: check_runtime.stdout == ""
+
+  - name: delete simulators
+    shell: xcrun simctl delete all
+
+  - name: create Simulator
+    shell: xcrun simctl create "iPhone 13 Pro Max" "iPhone 13 Pro Max" iOS{{ ios_runtime }}
+    register: simulator_id
+
+  - name: Simulator check debug
+    debug:
+      msg: "{{ simulator_id.stdout }}"
+
+  - name: check create Simulator
+    shell: xcrun simctl list devices | grep {{ simulator_id.stdout }}

@@ -1,0 +1,17 @@
+---
+  - name: appium installed list
+    ansible.builtin.command: appium driver list --installed
+    register: listappium
+
+  - name: appium installed list print
+    debug:
+      msg: "{{ listappium }}"
+
+  - name:  uiautomator2 install
+    ansible.builtin.command: appium driver install uiautomator2
+    when: "listappium.stderr | regex_search('uiautomator2[^\n]*not[^\n]*\\n') is not none"
+
+  - name:  xcuitest install
+    ansible.builtin.command: appium driver install xcuitest
+    when: "listappium.stderr | regex_search('xcuitest[^\n]*not[^\n]*\\n') is not none"
+    become: true
