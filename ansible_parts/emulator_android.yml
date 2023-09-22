@@ -12,10 +12,3 @@
     ansible.builtin.copy:
       src: resources/config.ini
       dest: ~/.android/avd/MyEmulator.avd/config.ini
-
-  - name: 11 JAVA_HOME to ~/.zprofile
-    ansible.builtin.lineinfile:
-      path: ${HOME}/.zprofile
-      regexp: '^export JAVA_HOME'
-      line: 'export JAVA_HOME=$(/usr/libexec/java_home -v 11.0.20.1)'
-      create: true

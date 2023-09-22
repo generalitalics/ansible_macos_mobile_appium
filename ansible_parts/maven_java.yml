@@ -11,6 +11,37 @@
     debug:
       msg: "{{ java_version.stderr_lines }}"
 
+  - name: Create Autotests directory
+    ansible.builtin.file:
+      path: ~/Autotests
+      state: directory
+
+  - name: Copy file artifactory.cer to remote server
+    ansible.builtin.copy:
+      src: resources/artifactory.cer
+      dest: ~/Autotests/artifactory.cer
+
+  # - name: Casert add artifactory.cer
+  #   shell: sudo keytool -import -alias artifactory -keystore $HOMEBREW_PREFIX/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home/lib/security/cacerts -file ~/Autotests/artifactory.cer
+  #   register: casert
+  #   become: true
+
+  - name: Casert add artifactory.cer
+    community.general.java_cert:
+      cert_path: ~/Autotests/artifactory.cer
+      keystore_path: $HOMEBREW_PREFIX/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home/lib/security/cacerts
+      keystore_pass: changeit
+      keystore_create: true
+      state: present
+      cert_alias: artifactory
+      trust_cacert: true
+
+  - name: Set access to casert
+    ansible.builtin.file:
+      path: $HOMEBREW_PREFIX/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home/lib/security/cacerts
+      state: file
+      mode: '0644'
+
   - name: Path to maven
     shell: mvn -v | grep -o '\/opt\/homebrew\/Cellar.*maven\/\d\.\d\.\d\/libexec' 
     register: mvn_home

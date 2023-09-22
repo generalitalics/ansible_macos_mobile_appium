@@ -21,7 +21,7 @@
         msg: "{{whoami.stdout_lines}}"
 
   vars:
-    # mas_email: "myc.at.server@gmail.com"
+    # mas_email: "example@gmail.com"
     # mas_password: ""
     ios_runtime: "16.2"
     mas_installed_app_ids:
@@ -39,7 +39,6 @@
       - android-platform-tools
 
   tasks:
-
     - name: Appium configuration
       ansible.builtin.import_tasks:
         file: ansible_parts/appium.yml
@@ -68,6 +67,14 @@
     - name: Emulator Android configuration
       ansible.builtin.import_tasks:
         file: ansible_parts/emulator_android.yml
+
+  post_tasks:
+      - name: 11 JAVA_HOME to ~/.zprofile
+        ansible.builtin.lineinfile:
+          path: ${HOME}/.zprofile
+          regexp: '^export JAVA_HOME'
+          line: 'export JAVA_HOME=$(/usr/libexec/java_home -v 11.0.20.1)'
+          create: true
 
   roles:
     - role: geerlingguy.mac.homebrew
