@@ -9,4 +9,17 @@
 
   - name: Print java version output
     debug:
-      msg: java_version.stdout
+      msg: "{{ java_version.stderr_lines }}"
+
+  - name: Path to maven
+    shell: mvn -v | grep -o '\/opt\/homebrew\/Cellar.*maven\/\d\.\d\.\d\/libexec' 
+    register: mvn_home
+
+  - name: Print maven path
+    debug:
+      msg: "{{ mvn_home.stdout }}"
+
+  - name: Copy file settings.xml for Maven
+    ansible.builtin.copy:
+      src: resources/settings.xml
+      dest: "{{ mvn_home.stdout }}/conf/settings.xml"
