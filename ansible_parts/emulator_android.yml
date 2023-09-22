@@ -1,6 +1,12 @@
 ---
   - name: download emulator's resources
     shell: sdkmanager --install "system-images;android-30;default;x86_64"
+    register: sdmanager_out
+    ignore_errors: true
+
+  - name: print sdmanager_out
+    debug:
+      msg: "{{ sdmanager_out }}"
 
   - name: delete emulator
     shell: avdmanager -v delete avd -n MyEmulator

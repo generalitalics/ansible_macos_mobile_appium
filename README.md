@@ -22,7 +22,7 @@ echo "no" | avdmanager --verbose create avd --force --name "pixel_5_api30_google
 4. Настройка Appium и плагинов для него
 5. Настройка и обновление Xcode (доделать!)
 6. Настройка ~/.zprofile - подстановка файла из корня. Комментируем JAVA_HOME в ~/.zprofile для JAVA_HOME на runtime ⩾ 61
-7. Настройка Java 11 и Maven(последний из homebrew)
+7. Настройка Java 11(casert artifactory.cer и file mode) и Maven(последний из homebrew)
 8. Настройка симулятора iOS
 9. Настройка эмулятора Android. Возвращаем настройку JAVA_HOME на Java 11
 

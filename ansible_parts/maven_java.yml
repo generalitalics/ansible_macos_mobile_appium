@@ -1,13 +1,15 @@
 ---
   - name: Add link to 11 java VM
-    shell: sudo ln -sfn $HOMEBREW_PREFIX/opt/openjdk@11/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-11.jdk
-    become: true
+    ansible.builtin.file:
+      path: $HOMEBREW_PREFIX/opt/openjdk@11/libexec/openjdk.jdk
+      dest: /Library/Java/JavaVirtualMachines/openjdk-11.jdk
+      state: link
 
-  - name: Check java version
-    shell: java -version
+  - name: Check 20 java version
+    shell: touch ~/.zprofile; source ~/.zprofile; java -version
     register: java_version
 
-  - name: Print java version output
+  - name: Print 20 java version output
     debug:
       msg: "{{ java_version.stderr_lines }}"
 
@@ -20,11 +22,6 @@
     ansible.builtin.copy:
       src: resources/artifactory.cer
       dest: ~/Autotests/artifactory.cer
-
-  # - name: Casert add artifactory.cer
-  #   shell: sudo keytool -import -alias artifactory -keystore $HOMEBREW_PREFIX/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home/lib/security/cacerts -file ~/Autotests/artifactory.cer
-  #   register: casert
-  #   become: true
 
   - name: Casert add artifactory.cer
     community.general.java_cert:

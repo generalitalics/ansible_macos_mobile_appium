@@ -39,42 +39,53 @@
       - android-platform-tools
 
   tasks:
-    - name: Appium configuration
-      ansible.builtin.import_tasks:
-        file: ansible_parts/appium.yml
+    - name: Main part of configuration
+      block:
+        - name: Appium configuration
+          ansible.builtin.import_tasks:
+            file: ansible_parts/appium.yml
 
-# доделать    
-    # - name: xcode aim
-    #   shell: sudo xcode-select -s /Applications/Xcode.app
-    #   become: true
-    
-    # - name: xcode update
-    #   shell: mas upgrade 497799835
-    #   become: true
+    # доделать    
+        # - name: xcode aim
+        #   shell: sudo xcode-select -s /Applications/Xcode.app
+        #   become: true
+        
+        # - name: xcode update
+        #   shell: mas upgrade 497799835
+        #   become: true
 
-    - name: ~/.zprofile configuration
-      ansible.builtin.import_tasks:
-        file: ansible_parts/zprofile.yml
+        - name: ~/.zprofile configuration
+          ansible.builtin.import_tasks:
+            file: ansible_parts/zprofile.yml
 
-    - name: Java and Maven configuration
-      ansible.builtin.import_tasks:
-        file: ansible_parts/maven_java.yml
+        - name: Sumulator iOS configuration
+          ansible.builtin.import_tasks:
+            file: ansible_parts/simulator_ios.yml
 
-    - name: Sumulator iOS configuration
-      ansible.builtin.import_tasks:
-        file: ansible_parts/simulator_ios.yml
+        - name: Emulator Android configuration
+          ansible.builtin.import_tasks:
+            file: ansible_parts/emulator_android.yml
 
-    - name: Emulator Android configuration
-      ansible.builtin.import_tasks:
-        file: ansible_parts/emulator_android.yml
+        - name: Java and Maven configuration
+          ansible.builtin.import_tasks:
+            file: ansible_parts/maven_java.yml
 
-  post_tasks:
-      - name: 11 JAVA_HOME to ~/.zprofile
-        ansible.builtin.lineinfile:
-          path: ${HOME}/.zprofile
-          regexp: '^export JAVA_HOME'
-          line: 'export JAVA_HOME=$(/usr/libexec/java_home -v 11.0.20.1)'
-          create: true
+      always:
+        - name: 11 JAVA_HOME to ~/.zprofile
+          ansible.builtin.lineinfile:
+            path: ${HOME}/.zprofile
+            regexp: '.*export JAVA_HOME'
+            line: 'export JAVA_HOME=$(/usr/libexec/java_home -v 11.0.20.1)'
+            create: true
+
+        - name: Check 11 java version
+          shell: touch ~/.zprofile; source ~/.zprofile; java -version
+          register: java_version
+
+        - name: Print 11 java version output
+          debug:
+            msg: "{{ java_version.stderr_lines }}"
+
 
   roles:
     - role: geerlingguy.mac.homebrew
